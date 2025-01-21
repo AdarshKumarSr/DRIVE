@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+
+  <script>
+    // Tailwind Dark Mode Configuration
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+  </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 shadow p-4 flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <img src="https://via.placeholder.com/40" alt="Logo" class="h-8 w-8">
+      <span class="text-xl font-semibold text-gray-800 dark:text-gray-200">MyDrive</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <input type="text" placeholder="Search files" class="border p-2 rounded-lg w-64 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+      <button id="upload-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Upload</button>
+      <img src="https://via.placeholder.com/40" alt="User Avatar" class="h-8 w-8 rounded-full">
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-gray-800 p-4 shadow h-screen">
+      <nav class="space-y-4">
+        <a href="#" class="flex items-center p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <svg class="h-5 w-5 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3z"/></svg>
+          My Drive
+        </a>
+        <a href="#" class="flex items-center p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <svg class="h-5 w-5 mr-2 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3z"/></svg>
+          Shared with Me
+        </a>
+        <a href="#" class="flex items-center p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <svg class="h-5 w-5 mr-2 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3z"/></svg>
+          Recent
+        </a>
+        <a href="#" class="flex items-center p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <svg class="h-5 w-5 mr-2 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3z"/></svg>
+          Trash
+        </a>
+      </nav>
+    </aside>
+    <main class="flex-1 p-6">
+      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">My Drive</h2>
+      <div class="grid grid-cols-4 gap-4">
+        <% files.forEach(file => { %>
+          <div class="relative bg-white dark:bg-gray-800 p-4 rounded-lg shadow group transition-transform duration-200 hover:scale-105">
+            <!-- SVG Icon -->
+            <svg class="h-12 w-12 mx-auto text-blue-500 transition-opacity duration-200 group-hover:opacity-30 group-hover:blur-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 3h18v18H3z" />
+            </svg>
+    
+            <!-- File Name -->
+            <p class="text-center mt-2 text-gray-700 dark:text-gray-200 transition-opacity duration-200 group-hover:opacity-30 group-hover:blur-sm">
+              <%= file.fileName %>
+            </p>
+    
+            <!-- Hover Buttons -->
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <!-- Download Button -->
+              <button class="bg-blue-500 bg-opacity-80 hover:bg-blue-600 text-white px-3 py-2 rounded-full mx-1 transition-transform duration-300 transform hover:scale-110 flex items-center gap-1">
+                <a href="/download/<%= file.filePath %>" download="<%= file.fileName %>" class="flex items-center gap-1">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
+                </a>
+            </button>
+            
+            
+            
+    
+              <!-- Delete Button -->
+              <button class="bg-red-500 bg-opacity-80 hover:bg-red-600 text-white px-3 py-2 rounded-full mx-1 transition-transform duration-300 transform hover:scale-110 flex items-center gap-1" onclick="deleteFile('<%= file._id %>')">
+                <i class="fas fa-trash-alt"></i> 
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </main>
+    
+
+
+  <!-- Upload Modal -->
+  <div id="upload-modal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg max-w-lg w-full">
+      <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Upload File</h2>
+      <form 
+        action="/user/upload"
+        method="post"
+        enctype="multipart/form-data"
+        class="space-y-4"
+      >
+      <div class="flex items-center justify-center w-full">
+        <label id="dropzone" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+            </svg>
+            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to </span> or drag and drop</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+          </div>
+          <!-- Input remains hidden -->
+          <input id="file-input" type="file" name="file" class="hidden" />
+        </label>
+      </div>
+      
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="close-modal" class="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg">Cancel</button>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+   // Modal Elements
+const uploadBtn = document.getElementById('upload-btn');
+const uploadModal = document.getElementById('upload-modal');
+const closeModal = document.getElementById('close-modal');
+
+// Drag-and-Drop Elements
+const dropZone = document.getElementById('dropzone');
+const fileInput = document.getElementById('file-input');
+
+// Modal Logic
+uploadBtn.addEventListener('click', () => {
+  uploadModal.classList.remove('hidden'); // Show the modal
+});
+
+closeModal.addEventListener('click', () => {
+  uploadModal.classList.add('hidden'); // Hide the modal
+});
+
+// Prevent Default Drag-and-Drop Behavior
+['dragover', 'drop'].forEach(eventType => {
+  dropZone.addEventListener(eventType, (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  });
+});
+
+// Handle File Drop
+dropZone.addEventListener('drop', (event) => {
+  const files = event.dataTransfer.files; // Get the dropped files
+
+  // Assign the dropped files to the hidden input element
+  fileInput.files = files;
+
+  // Log file names (optional debugging)
+  console.log('Dropped files:', files);
+
+  // Automatically submit the form (optional)
+  // document.querySelector('form').submit();
+});
+
+// Optional: Add hover styles during dragover
+dropZone.addEventListener('dragover', () => {
+  dropZone.classList.add('bg-gray-100', 'dark:bg-gray-600');
+});
+
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('bg-gray-100', 'dark:bg-gray-600');
+});
+
+// function downloadFile(filePath) {
+//     const url = `/download?filePath=${encodeURIComponent(filePath)}`;
+//     console.log('Download URL:', url); // Debugging
+//     window.location.href = url;
+// }
+
+
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+</body>
+</html>
